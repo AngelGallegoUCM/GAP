@@ -1,0 +1,42 @@
+
+version: '3'
+
+services:
+  web:
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - ./www:/var/www/html
+    depends_on:
+      - mysql
+    restart: always
+
+
+  mysql:
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./universidad.sql:/docker-entrypoint-initdb.d/universidad.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: "admin123!"
+      MYSQL_DATABASE: universidad
+    restart: always
+
+  phpmyadmin:
+    image: linuxserver/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - MYSQL_ROOT_PASSWORD=admin123!
+    depends_on:
+      - mysql
+    restart: always
+
+
+volumes:
+  mysql_data:

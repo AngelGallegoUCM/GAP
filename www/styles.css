@@ -1,0 +1,219 @@
+/* Reseteo básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  #popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+  
+  .popup-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    width: 400px; /* Ajusta el ancho según sea necesario */
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    height: 100vh; /* Asegura que el cuerpo ocupe toda la pantalla */
+    display: flex;
+  }
+  
+  .container {
+    display: flex;
+    width: 100%; /* Asegura que ocupe todo el ancho */
+    height: 100%; /* Asegura que ocupe toda la altura */
+  }
+  
+  /* Barra lateral */
+  .logo img {
+    width: 170px;
+    height: 170px;
+    object-fit: contain; /* Asegura que la imagen mantenga sus proporciones */
+}
+  .sidebar {
+    background-color: #003366;
+    color: white;
+    width: 250px;
+    padding: 20px;
+  }
+  
+  .sidebar h2 {
+    margin-bottom: 20px;
+  }
+  
+  .sidebar ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .sidebar ul li {
+    margin: 10px 0;
+  }
+  
+  .sidebar ul li a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  /* Contenido principal */
+  .main-content {
+    flex-grow: 1; /* Ocupa todo el espacio sobrante */
+    background-color: #f4f4f4; /* Fondo claro */
+    padding: 30px;
+  }
+  
+  .header h1 {
+    font-size: 24px;
+  }
+  
+  .header p {
+    font-size: 18px;
+  }
+  
+  /* Barra de búsqueda */
+  .search-bar {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .search-bar input {
+    padding: 10px;
+  }
+  
+  .search-bar button {
+    background-color: #007bff; /* Azul brillante */
+    color: white;
+  }
+  
+  /* Tabla de datos */
+/* Estilo para la tabla */
+table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  table th, table td {
+    text-align: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+  }
+  
+  table th {
+    background-color: #f4f4f4;
+  }
+  
+  /* Centrar la columna de acciones */
+  .actions {
+    text-align: center; /* Centra el contenido */
+  }
+  
+  /* Botones de acción */
+  .view-btn, .edit-btn, .delete-btn {
+    background-color: #007bff; /* Azul para los botones */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin: 0 5px; /* Espaciado entre botones */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer;
+  }
+  
+  .edit-btn {
+    background-color: #ffc107; /* Amarillo para "Modificar" */
+  }
+  
+  
+  .delete-btn {
+    background-color: #dc3545; /* Rojo para "Eliminar" */
+  }
+  
+  /* Efecto hover en los botones */
+  .view-btn:hover, .edit-btn:hover, .delete-btn:hover {
+    opacity: 0.8; /* Reduce la opacidad al pasar el ratón */
+  }
+
+  /* Botón de Justificar */
+.justify-btn {
+  background-color: #28a745; /* Verde */
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.justify-btn:hover {
+  opacity: 0.8;
+}
+
+/* Botón de Enviar Correo */
+.email-btn {
+  background-color: #17a2b8; /* Azul claro */
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.email-btn:hover {
+  opacity: 0.8;
+}
+
+
+  /*Formulario */
+
+  .add-btn {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.add-btn:hover {
+    background-color: #0056b3;
+}
+
+.form-container {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.form-group label {
+    display: block;
+}
+
+.form-group input,
+.form-group select {
+    width: calc(100% - 20px);
+    margin-bottom: 10px;
+}
+
+

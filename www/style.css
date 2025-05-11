@@ -1,0 +1,365 @@
+/* Reseteo básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* Barra lateral */
+.logo img {
+  width: 170px;
+  height: 170px;
+  object-fit: contain; /* Asegura que la imagen mantenga sus proporciones */
+}
+
+.sidebar {
+  background-color: #003366;
+  color: white;
+  width: 250px;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  margin: 10px 0;
+}
+
+.sidebar ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Contenido principal */
+.main-content {
+  flex-grow: 1;
+  background-color: #f4f4f4; /* Fondo claro */
+  padding: 30px;
+}
+
+.header h1 {
+  font-size: 24px;
+}
+
+.header p {
+  font-size: 18px;
+}
+
+.modules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, auto));
+  gap: 20px;
+  justify-content: center;
+}
+
+.module {
+  background-color: #e6f7ff; /* Azul claro */
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px;
+}
+
+.module img {
+  width: 50px;
+}
+
+.module p {
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.module:hover {
+  background-color: #cceeff; /* Azul más claro al pasar el ratón */
+}
+
+/* Botón invisible */
+.invisible-button {
+  background: none; /* Sin fondo */
+  border: none; /* Sin bordes */
+  color: inherit; /* Hereda el color del texto circundante */
+  font-size: inherit; /* Hereda el tamaño de fuente del entorno */
+  cursor: pointer; /* Cambia el cursor al pasar por encima */
+  padding: 0; /* Sin relleno */
+}
+
+.invisible-button:hover {
+  text-decoration: underline; /* Subraya el texto al pasar el ratón */
+}
+
+/* Estilos para la información del usuario */
+.user-welcome {
+  background-color: #f8f9fa;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  border-left: 4px solid #4e73df;
+}
+
+.user-welcome h2 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  background-color: #4e73df;
+  color: white;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+/* Panel de acceso rápido */
+.quick-access {
+  margin-bottom: 30px;
+}
+
+.quick-access h3 {
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.module-card {
+  display: block;
+  text-decoration: none;
+  color: #333;
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.module-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.module-icon {
+  font-size: 32px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+}
+
+.module-card h4 {
+  margin: 0 0 10px 0;
+  color: #4e73df;
+}
+
+.module-card p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.admin-module {
+  background-color: #f8f5ff;
+  border-left: 3px solid #4e73df;
+}
+
+/* Panel de administración */
+.admin-panel {
+  background-color: #f0f8ff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 30px;
+  border-left: 4px solid #2c9cbd;
+}
+
+.admin-panel h3 {
+  color: #2c9cbd;
+  margin-top: 0;
+}
+
+.admin-panel ul {
+  padding-left: 20px;
+}
+
+.admin-panel li {
+  margin-bottom: 8px;
+}
+
+/* Estilos para el encabezado de sección */
+.section-heading {
+  border-bottom: 1px solid #e3e6f0;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Estilos para el enlace "Ver todos" */
+.view-all {
+  font-size: 14px;
+  color: #4e73df;
+  text-decoration: none;
+}
+
+.view-all:hover {
+  text-decoration: underline;
+}
+
+/* Estilos para actividad reciente */
+.recent-activity {
+  margin-top: 30px;
+}
+
+.activity-list {
+  list-style: none;
+  padding: 0;
+}
+
+.activity-item {
+  padding: 12px 15px;
+  border-left: 3px solid transparent;
+  margin-bottom: 8px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.activity-item:hover {
+  border-left-color: #4e73df;
+  background-color: #f1f3fa;
+}
+
+.activity-date {
+  color: #6c757d;
+  font-size: 12px;
+  display: block;
+  margin-top: 5px;
+}
+
+/* Estilos para el contenedor de error */
+.error-container {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: #fff5f5;
+  border-left: 5px solid #ff5252;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.error-title {
+  color: #e53935;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.error-message {
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.asignaturas-list {
+  background-color: #fff;
+  border: 1px solid #ffcdd2;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.asignaturas-list ul {
+  margin: 10px 0;
+  padding-left: 20px;
+}
+
+.asignaturas-list li {
+  margin-bottom: 5px;
+  padding: 3px 0;
+}
+
+/* Estilos para botones */
+.buttons {
+  margin-top: 25px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 15px;
+  background-color: #4e73df;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+}
+
+/* Estilos para errores técnicos */
+
+
+.tech-error {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #6c757d;
+  display: none;
+}
+
+.show-tech-error {
+  font-size: 12px;
+  color: #6c757d;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  margin-top: 10px;
+}
+
+/* Adaptaciones para móvil */
+@media (max-width: 768px) {
+  .modules-grid {
+      grid-template-columns: 1fr;
+  }
+  
+  .user-welcome, .admin-panel {
+      padding: 15px;
+  }
+}
+
