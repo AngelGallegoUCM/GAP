@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 02-05-2025 a las 17:51:11
--- Versión del servidor: 10.4.22-MariaDB
--- Versión de PHP: 8.1.2
+-- Servidor: mysql:3306
+-- Tiempo de generación: 13-05-2025 a las 10:43:10
+-- Versión del servidor: 8.4.5
+-- Versión de PHP: 8.3.19
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -21,6 +21,74 @@ SET time_zone = "+00:00";
 -- Base de datos: `universidad`
 --
 
+DELIMITER $$
+--
+-- Procedimientos
+--
+CREATE DEFINER=`root`@`%` PROCEDURE `GenerarIncidencias` ()   BEGIN
+    -- Insertar incidencias para asistencias no marcadas como presentes del día actual
+    INSERT INTO incidencias (asistencia_id,justificada, descripcion, fecha_incidencia)
+    SELECT 
+        id,
+        0,
+        '', 
+        NOW()
+    FROM asistencias
+    WHERE presente = FALSE
+    AND fecha = CURDATE();
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `generar_asistencias_diarias` ()   BEGIN
+    DECLARE dia_actual VARCHAR(20);
+    DECLARE es_no_lectivo INT;
+    
+    -- Obtener el día actual en español
+    SET dia_actual = get_dia_espanol();
+    
+    -- Verificar si es un día no lectivo
+    SELECT COUNT(*) INTO es_no_lectivo 
+    FROM nolectivo 
+    WHERE fecha = CURDATE();
+    
+    -- Si no es un día no lectivo, generar asistencias
+    IF es_no_lectivo = 0 THEN
+        -- Eliminar asistencias previas para el día actual (si existen)
+        DELETE FROM asistencias WHERE fecha = CURDATE();
+        
+        -- Insertar nuevas asistencias para las asignaturas del día
+        INSERT INTO asistencias (asignatura_id, fecha, presente)
+        SELECT a.id, CURDATE(), FALSE
+        FROM horarios h
+        JOIN asignaturas a ON h.asignatura_id = a.id
+        WHERE h.dia_semana = dia_actual;
+    END IF;
+END$$
+
+--
+-- Funciones
+--
+CREATE DEFINER=`root`@`%` FUNCTION `get_dia_espanol` () RETURNS VARCHAR(20) CHARSET utf8mb4 DETERMINISTIC BEGIN
+    DECLARE dia_es VARCHAR(20);
+    DECLARE dia_en VARCHAR(20);
+    
+    SET dia_en = DAYNAME(CURDATE());
+    
+    -- Mapeo de días en inglés a español
+    CASE dia_en
+        WHEN 'Monday' THEN SET dia_es = 'Lunes';
+        WHEN 'Tuesday' THEN SET dia_es = 'Martes';
+        WHEN 'Wednesday' THEN SET dia_es = 'Miércoles';
+        WHEN 'Thursday' THEN SET dia_es = 'Jueves';
+        WHEN 'Friday' THEN SET dia_es = 'Viernes';
+        WHEN 'Saturday' THEN SET dia_es = 'Sábado';
+        WHEN 'Sunday' THEN SET dia_es = 'Domingo';
+    END CASE;
+    
+    RETURN dia_es;
+END$$
+
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -28,12 +96,12 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `asignaturas` (
-  `id` int(11) NOT NULL,
-  `profesor_id` int(11) NOT NULL,
-  `aula_id` int(11) NOT NULL,
+  `id` int NOT NULL,
+  `profesor_id` int NOT NULL,
+  `aula_id` int NOT NULL,
   `nombre_asignatura` varchar(100) NOT NULL,
   `grupo` varchar(10) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `asignaturas`
@@ -72,11 +140,11 @@ INSERT INTO `asignaturas` (`id`, `profesor_id`, `aula_id`, `nombre_asignatura`, 
 --
 
 CREATE TABLE `asistencias` (
-  `id` int(11) NOT NULL,
-  `asignatura_id` int(11) NOT NULL,
+  `id` int NOT NULL,
+  `asignatura_id` int NOT NULL,
   `fecha` date NOT NULL,
   `presente` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `asistencias`
@@ -125,7 +193,13 @@ INSERT INTO `asistencias` (`id`, `asignatura_id`, `fecha`, `presente`) VALUES
 (44, 25, '2025-04-04', 0),
 (45, 26, '2025-04-04', 0),
 (46, 27, '2025-04-04', 0),
-(47, 28, '2025-04-04', 0);
+(47, 28, '2025-04-04', 0),
+(55, 2, '2025-05-13', 1),
+(56, 14, '2025-05-13', 0),
+(57, 15, '2025-05-13', 0),
+(58, 16, '2025-05-13', 0),
+(59, 17, '2025-05-13', 1),
+(60, 18, '2025-05-13', 0);
 
 -- --------------------------------------------------------
 
@@ -134,10 +208,10 @@ INSERT INTO `asistencias` (`id`, `asignatura_id`, `fecha`, `presente`) VALUES
 --
 
 CREATE TABLE `aulas` (
-  `id` int(11) NOT NULL,
-  `numero_aula` int(11) NOT NULL,
-  `capacidad` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `id` int NOT NULL,
+  `numero_aula` int NOT NULL,
+  `capacidad` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `aulas`
@@ -161,40 +235,15 @@ INSERT INTO `aulas` (`id`, `numero_aula`, `capacidad`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `configuracion_sistema`
---
-
-CREATE TABLE `configuracion_sistema` (
-  `id` int(11) NOT NULL,
-  `clave` varchar(50) NOT NULL,
-  `valor` text DEFAULT NULL,
-  `descripcion` varchar(255) DEFAULT NULL,
-  `fecha_modificacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Volcado de datos para la tabla `configuracion_sistema`
---
-
-INSERT INTO `configuracion_sistema` (`id`, `clave`, `valor`, `descripcion`, `fecha_modificacion`) VALUES
-(1, 'email_remitente', 'anggal02@ucm.es', 'Correo electrónico desde el que se envían las notificaciones', '2025-04-29 12:10:18'),
-(2, 'email_password', '$2y$10$SRVcs0CV8GNutqHrDSLoPOc3vOMX6hf22J5MH4USxeCbG7katjtgC', 'Contraseña del correo electrónico (encriptada)', '2025-04-29 12:10:18'),
-(3, 'email_servidor', 'smtp.gmail.com', 'Servidor SMTP para envío de correos', '2025-04-29 12:08:36'),
-(4, 'email_puerto', '587', 'Puerto del servidor SMTP', '2025-04-29 12:08:36'),
-(5, 'email_seguridad', 'tls', 'Tipo de seguridad (tls, ssl, ninguna)', '2025-04-29 12:08:36');
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `departamento`
 --
 
 CREATE TABLE `departamento` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `nombre_departamento` varchar(100) NOT NULL,
-  `jefe_id` int(11) DEFAULT NULL,
+  `jefe_id` int DEFAULT NULL,
   `correo_departamento` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `departamento`
@@ -212,12 +261,12 @@ INSERT INTO `departamento` (`id`, `nombre_departamento`, `jefe_id`, `correo_depa
 --
 
 CREATE TABLE `horarios` (
-  `id` int(11) NOT NULL,
-  `asignatura_id` int(11) NOT NULL,
+  `id` int NOT NULL,
+  `asignatura_id` int NOT NULL,
   `dia_semana` enum('Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo') NOT NULL,
   `hora_inicio` time NOT NULL,
   `hora_fin` time NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `horarios`
@@ -277,12 +326,12 @@ INSERT INTO `horarios` (`id`, `asignatura_id`, `dia_semana`, `hora_inicio`, `hor
 --
 
 CREATE TABLE `incidencias` (
-  `id` int(11) NOT NULL,
-  `asistencia_id` int(11) NOT NULL,
+  `id` int NOT NULL,
+  `asistencia_id` int NOT NULL,
   `justificada` tinyint(1) NOT NULL,
-  `descripcion` text DEFAULT NULL,
-  `fecha_incidencia` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `descripcion` text,
+  `fecha_incidencia` datetime DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `incidencias`
@@ -330,7 +379,11 @@ INSERT INTO `incidencias` (`id`, `asistencia_id`, `justificada`, `descripcion`, 
 (46, 44, 0, '', '2025-04-04 10:00:00'),
 (47, 45, 1, 'Ingreso hospitalario urgente', '2025-04-04 12:25:00'),
 (48, 46, 0, '', '2025-04-04 15:35:00'),
-(49, 47, 1, 'Citación judicial', '2025-04-04 17:40:00');
+(49, 47, 1, 'Citación judicial', '2025-04-04 17:40:00'),
+(50, 56, 0, '', '2025-05-13 10:42:21'),
+(51, 57, 0, '', '2025-05-13 10:42:21'),
+(52, 58, 0, '', '2025-05-13 10:42:21'),
+(53, 60, 0, '', '2025-05-13 10:42:21');
 
 -- --------------------------------------------------------
 
@@ -339,10 +392,10 @@ INSERT INTO `incidencias` (`id`, `asistencia_id`, `justificada`, `descripcion`, 
 --
 
 CREATE TABLE `nolectivo` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `fecha` date NOT NULL,
   `descripcion` varchar(255) DEFAULT 'Día restringido'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `nolectivo`
@@ -370,13 +423,13 @@ INSERT INTO `nolectivo` (`id`, `fecha`, `descripcion`) VALUES
 --
 
 CREATE TABLE `profesores` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `nombre` varchar(50) NOT NULL,
   `apellidos` varchar(100) NOT NULL,
   `identificador` varchar(50) DEFAULT NULL,
   `CorreoPropio` varchar(100) DEFAULT NULL,
-  `departamento_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `departamento_id` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `profesores`
@@ -415,13 +468,13 @@ INSERT INTO `profesores` (`id`, `nombre`, `apellidos`, `identificador`, `CorreoP
 --
 
 CREATE TABLE `usuarios` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
   `nombre` varchar(100) NOT NULL,
   `rol` enum('admin','editor','lector') NOT NULL DEFAULT 'lector',
-  `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
@@ -454,14 +507,6 @@ ALTER TABLE `asistencias`
 --
 ALTER TABLE `aulas`
   ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `configuracion_sistema`
---
-ALTER TABLE `configuracion_sistema`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `clave` (`clave`),
-  ADD KEY `idx_config_clave` (`clave`);
 
 --
 -- Indices de la tabla `departamento`
@@ -513,61 +558,55 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `asignaturas`
 --
 ALTER TABLE `asignaturas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de la tabla `asistencias`
 --
 ALTER TABLE `asistencias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT de la tabla `aulas`
 --
 ALTER TABLE `aulas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
-
---
--- AUTO_INCREMENT de la tabla `configuracion_sistema`
---
-ALTER TABLE `configuracion_sistema`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `departamento`
 --
 ALTER TABLE `departamento`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `horarios`
 --
 ALTER TABLE `horarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT de la tabla `incidencias`
 --
 ALTER TABLE `incidencias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT de la tabla `nolectivo`
 --
 ALTER TABLE `nolectivo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `profesores`
 --
 ALTER TABLE `profesores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Restricciones para tablas volcadas
@@ -603,6 +642,25 @@ ALTER TABLE `incidencias`
 --
 ALTER TABLE `profesores`
   ADD CONSTRAINT `profesores_ibfk_1` FOREIGN KEY (`departamento_id`) REFERENCES `departamento` (`id`);
+
+DELIMITER $$
+--
+-- Eventos
+--
+CREATE DEFINER=`root`@`%` EVENT `GeneradorIncidencias` ON SCHEDULE EVERY 1 DAY STARTS '2025-05-13 08:00:00' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+    -- Solo ejecutar si es día entre semana (1=lunes, 5=viernes)
+    IF DAYOFWEEK(CURDATE()) BETWEEN 2 AND 6 THEN
+        CALL generar_asistencias_diarias();
+    END IF;
+END$$
+
+CREATE DEFINER=`root`@`%` EVENT `evento_generar_incidencias` ON SCHEDULE EVERY 1 DAY STARTS '2025-05-13 21:00:00' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+        IF WEEKDAY(CURRENT_DATE) BETWEEN 0 AND 4 THEN
+            CALL GenerarIncidencias();
+        END IF;
+    END$$
+
+DELIMITER ;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
