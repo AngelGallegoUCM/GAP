@@ -28,23 +28,7 @@ if (isset($_GET['id']) && !empty($_GET['id']) && is_numeric($_GET['id'])) {
         $stmt = $conn->prepare("DELETE FROM incidencias WHERE id = ?");
         $stmt->bind_param("i", $incidencia_id);
         
-        if ($stmt->execute()) {
-            // Registrar la actividad en el log
-            $log_query = "
-                INSERT INTO logs_actividad (usuario_id, accion, ip_usuario) 
-                VALUES (?, ?, ?)
-            ";
-            
-            if (isset($_SESSION['usuario_id'])) {
-                $accion = "Eliminación de incidencia ID: $incidencia_id";
-                $ip_usuario = $_SERVER['REMOTE_ADDR'];
-                $usuario_id = $_SESSION['usuario_id'];
-                
-                $log_stmt = $conn->prepare($log_query);
-                $log_stmt->bind_param("iss", $usuario_id, $accion, $ip_usuario);
-                $log_stmt->execute();
-            }
-            
+        if ($stmt->execute()) {            
             // Redirigir al listado con mensaje de éxito
             header("Location: ../ListadoIncidencias.php?success=1");
             exit();

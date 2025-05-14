@@ -44,7 +44,7 @@ verificarRol(['admin']);
                 
                 <label for="identificador">Identificador (único):</label>
                 <input type="text" id="identificador" name="identificador" maxlength="50" required
-                       pattern="[A-Za-z0-9\-_]+" title="Solo se permiten letras, números, guiones y guiones bajos">
+                       pattern="[A-Za-z0-9\-_ ]+" title="Solo se permiten letras, números, guiones, guiones bajos y espacios">
                 <small style="display: block; margin-top: 5px; color: #6c757d;">Este identificador debe ser único para cada profesor.</small>
 
                 <label for="correoPropio">Correo Propio:</label>

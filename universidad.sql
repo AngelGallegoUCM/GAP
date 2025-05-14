@@ -3,14 +3,13 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: mysql:3306
--- Tiempo de generación: 14-05-2025 a las 07:16:11
+-- Tiempo de generación: 14-05-2025 a las 09:36:57
 -- Versión del servidor: 8.4.5
 -- Versión de PHP: 8.3.19
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET GLOBAL time_zone = 'Europe/Madrid';
-
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -110,23 +109,23 @@ CREATE TABLE `asignaturas` (
 
 INSERT INTO `asignaturas` (`id`, `profesor_id`, `aula_id`, `nombre_asignatura`, `grupo`) VALUES
 (1, 1, 1, 'Programación', '1ºA'),
-(2, 2, 2, 'Álgebra', '1ºB'),
-(6, 5, 1, 'Fal', '4ºB'),
+(2, 28, 12, 'Álgebra', '1ºB'),
+(6, 28, 1, 'Fal', '4ºB'),
 (7, 5, 1, 'SO', '4ºB'),
 (9, 6, 3, 'Cálculo', '1ºA'),
 (10, 7, 4, 'Física', '1ºB'),
-(11, 8, 5, 'Algoritmos', '2ºA'),
+(11, 28, 12, 'Algoritmos', '2ºA'),
 (12, 9, 6, 'Bases de Datos', '2ºB'),
 (13, 10, 7, 'Redes', '3ºA'),
 (14, 11, 8, 'Sistemas Operativos', '3ºB'),
 (15, 12, 9, 'Inteligencia Artificial', '4ºA'),
 (16, 13, 10, 'Compiladores', '4ºB'),
-(17, 14, 1, 'Estadística', '1ºC'),
-(18, 15, 2, 'Matemática Discreta', '1ºD'),
-(19, 16, 3, 'Estructura de Computadores', '2ºC'),
-(20, 17, 4, 'Programación Avanzada', '2ºD'),
-(21, 18, 5, 'Ingeniería del Software', '3ºC'),
-(22, 19, 6, 'Seguridad Informática', '3ºD'),
+(17, 27, 1, 'Estadística', '1ºC'),
+(18, 27, 2, 'Matemática Discreta', '1ºD'),
+(19, 27, 3, 'Estructura de Computadores', '2ºC'),
+(20, 26, 4, 'Programación Avanzada', '2ºD'),
+(21, 26, 5, 'Ingeniería del Software', '3ºC'),
+(22, 26, 6, 'Seguridad Informática', '3ºD'),
 (23, 20, 7, 'Computación Gráfica', '4ºC'),
 (24, 21, 8, 'Sistemas Distribuidos', '4ºD'),
 (25, 22, 9, 'Aprendizaje Automático', '3ºA'),
@@ -231,7 +230,8 @@ INSERT INTO `aulas` (`id`, `numero_aula`, `capacidad`) VALUES
 (10, 204, 35),
 (11, 205, 28),
 (12, 301, 50),
-(13, 302, 45);
+(13, 302, 45),
+(14, 303, 30);
 
 -- --------------------------------------------------------
 
@@ -251,9 +251,9 @@ CREATE TABLE `departamento` (
 --
 
 INSERT INTO `departamento` (`id`, `nombre_departamento`, `jefe_id`, `correo_departamento`) VALUES
-(1, 'Computadores', 1, 'computadores@complutense.es'),
-(2, 'Redes', 2, 'redes@complutense.es'),
-(3, 'Software', 3, 'software@complutense.es');
+(1, 'Computadores', 1, 'computadores@ucm.es'),
+(2, 'Redes', 2, 'redes@ucm.es'),
+(3, 'Software', 3, 'software@ucm.es');
 
 -- --------------------------------------------------------
 
@@ -275,16 +275,11 @@ CREATE TABLE `horarios` (
 
 INSERT INTO `horarios` (`id`, `asignatura_id`, `dia_semana`, `hora_inicio`, `hora_fin`) VALUES
 (1, 1, 'Lunes', '09:00:00', '11:00:00'),
-(9, 2, 'Martes', '10:00:00', '12:00:00'),
-(10, 2, 'Jueves', '15:00:00', '16:00:00'),
-(11, 6, 'Viernes', '14:00:00', '16:00:00'),
 (12, 7, 'Viernes', '16:00:00', '18:00:00'),
 (13, 9, 'Lunes', '08:00:00', '10:00:00'),
 (14, 9, 'Miércoles', '08:00:00', '10:00:00'),
 (15, 10, 'Lunes', '10:00:00', '12:00:00'),
 (16, 10, 'Miércoles', '10:00:00', '12:00:00'),
-(17, 11, 'Lunes', '12:00:00', '14:00:00'),
-(18, 11, 'Miércoles', '12:00:00', '14:00:00'),
 (19, 12, 'Lunes', '15:00:00', '17:00:00'),
 (20, 12, 'Miércoles', '15:00:00', '17:00:00'),
 (21, 13, 'Lunes', '17:00:00', '19:00:00'),
@@ -295,18 +290,6 @@ INSERT INTO `horarios` (`id`, `asignatura_id`, `dia_semana`, `hora_inicio`, `hor
 (26, 15, 'Jueves', '10:00:00', '12:00:00'),
 (27, 16, 'Martes', '12:00:00', '14:00:00'),
 (28, 16, 'Jueves', '12:00:00', '14:00:00'),
-(29, 17, 'Martes', '15:00:00', '17:00:00'),
-(30, 17, 'Jueves', '15:00:00', '17:00:00'),
-(31, 18, 'Martes', '17:00:00', '19:00:00'),
-(32, 18, 'Jueves', '17:00:00', '19:00:00'),
-(33, 19, 'Miércoles', '08:00:00', '10:00:00'),
-(34, 19, 'Viernes', '08:00:00', '10:00:00'),
-(35, 20, 'Miércoles', '10:00:00', '12:00:00'),
-(36, 20, 'Viernes', '10:00:00', '12:00:00'),
-(37, 21, 'Miércoles', '12:00:00', '14:00:00'),
-(38, 21, 'Viernes', '12:00:00', '14:00:00'),
-(39, 22, 'Miércoles', '15:00:00', '17:00:00'),
-(40, 22, 'Viernes', '15:00:00', '17:00:00'),
 (41, 23, 'Jueves', '08:00:00', '10:00:00'),
 (42, 23, 'Viernes', '17:00:00', '19:00:00'),
 (43, 24, 'Jueves', '10:00:00', '12:00:00'),
@@ -318,7 +301,70 @@ INSERT INTO `horarios` (`id`, `asignatura_id`, `dia_semana`, `hora_inicio`, `hor
 (49, 27, 'Jueves', '17:00:00', '19:00:00'),
 (50, 27, 'Viernes', '17:00:00', '19:00:00'),
 (51, 28, 'Lunes', '08:00:00', '10:00:00'),
-(52, 28, 'Viernes', '08:00:00', '10:00:00');
+(52, 28, 'Viernes', '08:00:00', '10:00:00'),
+(61, 2, 'Lunes', '11:00:00', '13:00:00'),
+(62, 2, 'Martes', '11:00:00', '13:00:00'),
+(63, 2, 'Miércoles', '11:00:00', '13:00:00'),
+(64, 2, 'Jueves', '11:00:00', '13:00:00'),
+(65, 2, 'Viernes', '11:00:00', '13:00:00'),
+(66, 2, 'Sábado', '11:00:00', '13:00:00'),
+(67, 2, 'Domingo', '11:00:00', '13:00:00'),
+(70, 11, 'Lunes', '09:00:00', '11:00:00'),
+(71, 11, 'Martes', '09:00:00', '11:00:00'),
+(72, 11, 'Miércoles', '09:00:00', '11:00:00'),
+(73, 11, 'Jueves', '09:00:00', '11:00:00'),
+(74, 11, 'Viernes', '09:00:00', '11:00:00'),
+(75, 11, 'Sábado', '09:00:00', '11:00:00'),
+(76, 11, 'Domingo', '09:00:00', '11:00:00'),
+(77, 6, 'Lunes', '14:00:00', '17:00:00'),
+(78, 6, 'Martes', '14:00:00', '17:00:00'),
+(79, 6, 'Miércoles', '14:00:00', '17:00:00'),
+(80, 6, 'Jueves', '14:00:00', '17:00:00'),
+(81, 6, 'Viernes', '14:00:00', '17:00:00'),
+(82, 6, 'Sábado', '14:00:00', '17:00:00'),
+(83, 6, 'Domingo', '14:00:00', '17:00:00'),
+(84, 17, 'Lunes', '09:00:00', '11:00:00'),
+(85, 17, 'Martes', '09:00:00', '11:00:00'),
+(86, 17, 'Miércoles', '09:00:00', '11:00:00'),
+(87, 17, 'Jueves', '09:00:00', '11:00:00'),
+(88, 17, 'Viernes', '09:00:00', '11:00:00'),
+(89, 17, 'Sábado', '09:00:00', '11:00:00'),
+(90, 17, 'Domingo', '09:00:00', '11:00:00'),
+(91, 18, 'Lunes', '11:00:00', '13:00:00'),
+(92, 18, 'Martes', '11:00:00', '13:00:00'),
+(93, 18, 'Miércoles', '11:00:00', '13:00:00'),
+(94, 18, 'Jueves', '11:00:00', '13:00:00'),
+(95, 18, 'Viernes', '11:00:00', '13:00:00'),
+(96, 18, 'Sábado', '11:00:00', '13:00:00'),
+(97, 18, 'Domingo', '11:00:00', '13:00:00'),
+(98, 19, 'Lunes', '14:00:00', '17:00:00'),
+(99, 19, 'Martes', '14:00:00', '17:00:00'),
+(100, 19, 'Miércoles', '14:00:00', '17:00:00'),
+(101, 19, 'Jueves', '14:00:00', '17:00:00'),
+(102, 19, 'Viernes', '14:00:00', '17:00:00'),
+(103, 19, 'Sábado', '14:00:00', '17:00:00'),
+(104, 19, 'Domingo', '14:00:00', '17:00:00'),
+(105, 20, 'Lunes', '09:00:00', '11:00:00'),
+(106, 20, 'Martes', '09:00:00', '11:00:00'),
+(107, 20, 'Miércoles', '09:00:00', '11:00:00'),
+(108, 20, 'Jueves', '09:00:00', '11:00:00'),
+(109, 20, 'Viernes', '09:00:00', '11:00:00'),
+(110, 20, 'Sábado', '09:00:00', '11:00:00'),
+(111, 20, 'Domingo', '09:00:00', '11:00:00'),
+(112, 21, 'Lunes', '11:00:00', '13:00:00'),
+(113, 21, 'Martes', '11:00:00', '13:00:00'),
+(114, 21, 'Miércoles', '11:00:00', '13:00:00'),
+(115, 21, 'Jueves', '11:00:00', '13:00:00'),
+(116, 21, 'Viernes', '11:00:00', '13:00:00'),
+(117, 21, 'Sábado', '11:00:00', '13:00:00'),
+(118, 21, 'Domingo', '11:00:00', '13:00:00'),
+(119, 22, 'Lunes', '14:00:00', '17:00:00'),
+(120, 22, 'Martes', '14:00:00', '17:00:00'),
+(121, 22, 'Miércoles', '14:00:00', '17:00:00'),
+(122, 22, 'Jueves', '14:00:00', '17:00:00'),
+(123, 22, 'Viernes', '14:00:00', '17:00:00'),
+(124, 22, 'Sábado', '14:00:00', '17:00:00'),
+(125, 22, 'Domingo', '14:00:00', '17:00:00');
 
 -- --------------------------------------------------------
 
@@ -339,8 +385,6 @@ CREATE TABLE `incidencias` (
 --
 
 INSERT INTO `incidencias` (`id`, `asistencia_id`, `justificada`, `descripcion`, `fecha_incidencia`) VALUES
-(8, 6, 0, '', '2025-03-14 11:56:22'),
-(9, 7, 1, 'Hospital', '2025-03-14 11:56:22'),
 (10, 8, 0, '', '2025-03-04 09:15:00'),
 (11, 9, 1, 'Cita médica urgente', '2025-03-04 10:30:00'),
 (12, 10, 0, '', '2025-03-04 12:45:00'),
@@ -437,30 +481,33 @@ CREATE TABLE `profesores` (
 --
 
 INSERT INTO `profesores` (`id`, `nombre`, `apellidos`, `identificador`, `CorreoPropio`, `departamento_id`) VALUES
-(1, 'Raquel', 'Díaz Sánchez', '00000001A', 'raquel.diaz@complutense.es', 1),
-(2, 'Carlos', 'López García', '00000002B', 'carlos.lopez@complutense.es', 2),
-(3, 'Maríant', 'Pérez Gómez', '00000003C', 'maria.perez@complutense.es', 3),
-(5, 'Ángel', 'Gallego Muñoz', '00000004D', 'anggal02@ucm.es', 1),
-(6, 'Elena', 'Martínez Rodríguez', '12345678A', 'elena.martinez@complutense.es', 1),
-(7, 'David', 'García Sánchez', '23456789B', 'david.garcia@complutense.es', 2),
-(8, 'Laura', 'Hernández López', '34567890C', 'laura.hernandez@complutense.es', 3),
-(9, 'Javier', 'Fernández González', '45678901D', 'javier.fernandez@complutense.es', 1),
-(10, 'Ana', 'González Pérez', '56789012E', 'ana.gonzalez@complutense.es', 2),
-(11, 'Pablo', 'Sánchez Martínez', '67890123F', 'pablo.sanchez@complutense.es', 3),
-(12, 'Lucía', 'López García', '78901234G', 'lucia.lopez@complutense.es', 1),
-(13, 'Jorge', 'Pérez Hernández', '89012345H', 'jorge.perez@complutense.es', 2),
-(14, 'Sara', 'Rodríguez Fernández', '90123456I', 'sara.rodriguez@complutense.es', 3),
-(15, 'Miguel', 'González García', '01234567J', 'miguel.gonzalez@complutense.es', 1),
-(16, 'Carmen', 'López Rodríguez', '12345678K', 'carmen.lopez@complutense.es', 2),
-(17, 'Luis', 'Martínez González', '23456789L', 'luis.martinez@complutense.es', 3),
-(18, 'Paula', 'Sánchez López', '34567890M', 'paula.sanchez@complutense.es', 1),
-(19, 'Alberto', 'García Martínez', '45678901N', 'alberto.garcia@complutense.es', 2),
-(20, 'Eva', 'Fernández Sánchez', '56789012O', 'eva.fernandez@complutense.es', 3),
-(21, 'Daniel', 'Hernández González', '67890123P', 'daniel.hernandez@complutense.es', 1),
-(22, 'Marina', 'Pérez García', '78901234Q', 'marina.perez@complutense.es', 2),
-(23, 'Adrián', 'Rodríguez López', '89012345R', 'adrian.rodriguez@complutense.es', 3),
-(24, 'Marta', 'González Hernández', '90123456S', 'marta.gonzalez@complutense.es', 1),
-(25, 'Diego', 'López Pérez', '01234567T', 'diego.lopez@complutense.es', 2);
+(1, 'Raquel', 'Díaz Sánchez', '04 aa bb cc 24 02 89', 'raquel.diaz@ucm.es', 1),
+(2, 'Carlos', 'López García', '04 dd ee ff 24 02 89', 'carlos.lopez@ucm.es', 2),
+(3, 'Maríant', 'Pérez Gómez', '04 11 22 33 24 02 89', 'maria.perez@ucm.es', 3),
+(5, 'Ángel', 'Gallego Muñoz', '04 44 55 66 24 02 89', 'anggal02@ucm.es', 1),
+(6, 'Elena', 'Martínez Rodríguez', '04 77 88 99 24 02 89', 'elena.martinez@ucm.es', 1),
+(7, 'David', 'García Sánchez', '04 ab cd ef 24 02 89', 'david.garcia@ucm.es', 2),
+(8, 'Laura', 'Hernández López', '04 fe dc ba 24 02 89', 'laura.hernandez@ucm.es', 3),
+(9, 'Javier', 'Fernández González', '04 12 34 56 24 02 89', 'javier.fernandez@ucm.es', 1),
+(10, 'Ana', 'González Pérez', '04 78 9a bc 24 02 89', 'ana.gonzalez@ucm.es', 2),
+(11, 'Pablo', 'Sánchez Martínez', '04 de f0 12 24 02 89', 'pablo.sanchez@ucm.es', 3),
+(12, 'Lucía', 'López García', '04 34 56 78 24 02 89', 'lucia.lopez@ucm.es', 1),
+(13, 'Jorge', 'Pérez Hernández', '04 9a bc de 24 02 89', 'jorge.perez@ucm.es', 2),
+(14, 'Sara', 'Rodríguez Fernández', '04 f0 12 34 24 02 89', 'sara.rodriguez@ucm.es', 3),
+(15, 'Miguel', 'González García', '04 56 78 9a 24 02 89', 'miguel.gonzalez@ucm.es', 1),
+(16, 'Carmen', 'López Rodríguez', '04 bc de f0 24 02 89', 'carmen.lopez@ucm.es', 2),
+(17, 'Luis', 'Martínez González', '04 13 57 9b 24 02 89', 'luis.martinez@ucm.es', 3),
+(18, 'Paula', 'Sánchez López', '04 24 68 ac 24 02 89', 'paula.sanchez@ucm.es', 1),
+(19, 'Alberto', 'García Martínez', '04 35 79 bd 24 02 89', 'alberto.garcia@ucm.es', 2),
+(20, 'Eva', 'Fernández Sánchez', '04 46 8a ce 24 02 89', 'eva.fernandez@ucm.es', 3),
+(21, 'Daniel', 'Hernández González', '04 57 9b df 24 02 89', 'daniel.hernandez@ucm.es', 1),
+(22, 'Marina', 'Pérez García', '04 68 ac e0 24 02 89', 'marina.perez@ucm.es', 2),
+(23, 'Adrián', 'Rodríguez López', '04 79 bd f1 24 02 89', 'adrian.rodriguez@ucm.es', 3),
+(24, 'Marta', 'González Hernández', '04 8a ce 02 24 02 89', 'marta.gonzalez@ucm.es', 1),
+(25, 'Diego', 'López Pérez', '04 9b df 13 24 02 89', 'diego.lopez@ucm.es', 2),
+(26, 'María', 'González Rodríguez', ' 04 41 73 46 24 02 89', 'maria.gonzalez@ucm.es', 1),
+(27, 'Dorzhi', 'García España', '04 31 2d 4b 24 02 89', 'dorzhi.garcia@ucm.es', 1),
+(28, 'Daniel', 'Lopez Escobar', '04 01 53 67 24 02 89', 'daniel.lopez@ucm.es', 1);
 
 -- --------------------------------------------------------
 
@@ -559,19 +606,19 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `asignaturas`
 --
 ALTER TABLE `asignaturas`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de la tabla `asistencias`
 --
 ALTER TABLE `asistencias`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- AUTO_INCREMENT de la tabla `aulas`
 --
 ALTER TABLE `aulas`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `departamento`
@@ -583,7 +630,7 @@ ALTER TABLE `departamento`
 -- AUTO_INCREMENT de la tabla `horarios`
 --
 ALTER TABLE `horarios`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
 
 --
 -- AUTO_INCREMENT de la tabla `incidencias`
@@ -601,7 +648,7 @@ ALTER TABLE `nolectivo`
 -- AUTO_INCREMENT de la tabla `profesores`
 --
 ALTER TABLE `profesores`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
