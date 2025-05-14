@@ -9,7 +9,8 @@
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = '+2:00';
+SET GLOBAL time_zone = 'Europe/Madrid';
+
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,7 +19,7 @@ SET time_zone = '+2:00';
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `universidad2`
+-- Base de datos: `universidad`
 --
 
 DELIMITER $$
