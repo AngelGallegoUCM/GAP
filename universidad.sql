@@ -3,13 +3,13 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: mysql:3306
--- Tiempo de generación: 13-05-2025 a las 10:43:10
+-- Tiempo de generación: 14-05-2025 a las 07:16:11
 -- Versión del servidor: 8.4.5
 -- Versión de PHP: 8.3.19
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = "+00:00";
+SET time_zone = '+2:00';
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `universidad`
+-- Base de datos: `universidad2`
 --
 
 DELIMITER $$
@@ -380,10 +380,10 @@ INSERT INTO `incidencias` (`id`, `asistencia_id`, `justificada`, `descripcion`, 
 (47, 45, 1, 'Ingreso hospitalario urgente', '2025-04-04 12:25:00'),
 (48, 46, 0, '', '2025-04-04 15:35:00'),
 (49, 47, 1, 'Citación judicial', '2025-04-04 17:40:00'),
-(50, 56, 0, '', '2025-05-13 10:42:21'),
-(51, 57, 0, '', '2025-05-13 10:42:21'),
-(52, 58, 0, '', '2025-05-13 10:42:21'),
-(53, 60, 0, '', '2025-05-13 10:42:21');
+(57, 56, 0, '', '2025-05-13 21:00:00'),
+(58, 57, 0, '', '2025-05-13 21:00:00'),
+(59, 58, 0, '', '2025-05-13 21:00:00'),
+(60, 60, 0, '', '2025-05-13 21:00:00');
 
 -- --------------------------------------------------------
 
@@ -588,7 +588,7 @@ ALTER TABLE `horarios`
 -- AUTO_INCREMENT de la tabla `incidencias`
 --
 ALTER TABLE `incidencias`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT de la tabla `nolectivo`
@@ -647,18 +647,17 @@ DELIMITER $$
 --
 -- Eventos
 --
-CREATE DEFINER=`root`@`%` EVENT `GeneradorIncidencias` ON SCHEDULE EVERY 1 DAY STARTS '2025-05-13 08:00:00' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
-    -- Solo ejecutar si es día entre semana (1=lunes, 5=viernes)
-    IF DAYOFWEEK(CURDATE()) BETWEEN 2 AND 6 THEN
-        CALL generar_asistencias_diarias();
-    END IF;
-END$$
-
 CREATE DEFINER=`root`@`%` EVENT `evento_generar_incidencias` ON SCHEDULE EVERY 1 DAY STARTS '2025-05-13 21:00:00' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
         IF WEEKDAY(CURRENT_DATE) BETWEEN 0 AND 4 THEN
             CALL GenerarIncidencias();
         END IF;
     END$$
+
+CREATE DEFINER=`root`@`%` EVENT `GeneradorAsistencias` ON SCHEDULE EVERY 1 DAY STARTS '2025-05-13 08:00:00' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+    IF WEEKDAY(CURRENT_DATE) BETWEEN 0 AND 4 THEN
+        CALL generar_asistencias_diarias();
+    END IF;
+END$$
 
 DELIMITER ;
 COMMIT;
