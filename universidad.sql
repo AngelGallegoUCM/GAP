@@ -505,7 +505,7 @@ INSERT INTO `profesores` (`id`, `nombre`, `apellidos`, `identificador`, `CorreoP
 (23, 'Adrián', 'Rodríguez López', '04 79 bd f1 24 02 89', 'adrian.rodriguez@ucm.es', 3),
 (24, 'Marta', 'González Hernández', '04 8a ce 02 24 02 89', 'marta.gonzalez@ucm.es', 1),
 (25, 'Diego', 'López Pérez', '04 9b df 13 24 02 89', 'diego.lopez@ucm.es', 2),
-(26, 'María', 'González Rodríguez', ' 04 41 73 46 24 02 89', 'maria.gonzalez@ucm.es', 1),
+(26, 'María', 'González Rodríguez', '04 41 73 46 24 02 89', 'maria.gonzalez@ucm.es', 1),
 (27, 'Dorzhi', 'García España', '04 31 2d 4b 24 02 89', 'dorzhi.garcia@ucm.es', 1),
 (28, 'Daniel', 'Lopez Escobar', '04 01 53 67 24 02 89', 'daniel.lopez@ucm.es', 1);
 
