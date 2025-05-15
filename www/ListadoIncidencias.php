@@ -403,6 +403,7 @@ verificarSesion();
                                 // Para incidencias no justificadas y si el usuario tiene permisos
                                 if (in_array($_SESSION['rol'], ['admin', 'editor'])) {
                                     echo "<button class='justify-btn' onclick='mostrarPopup(" . htmlspecialchars($row['id']) . ")'>Justificar</button>";
+                                     echo "<button class='view-btn' onclick='mostrarDescripcion(" . htmlspecialchars($row['id']) . ", \"" . htmlspecialchars(addslashes($row['descripcion'])) . "\")'>Ver Información</button>";
                                 }
                             } else {
                                 // Para incidencias justificadas

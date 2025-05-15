@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: mysql:3306
--- Tiempo de generación: 14-05-2025 a las 09:36:57
+-- Tiempo de generación: 15-05-2025 a las 10:37:33
 -- Versión del servidor: 8.4.5
 -- Versión de PHP: 8.3.19
 
@@ -31,7 +31,7 @@ CREATE DEFINER=`root`@`%` PROCEDURE `GenerarIncidencias` ()   BEGIN
     SELECT 
         id,
         0,
-        '', 
+        'No se ha pasado la tarjeta', 
         NOW()
     FROM asistencias
     WHERE presente = FALSE
@@ -62,6 +62,137 @@ CREATE DEFINER=`root`@`%` PROCEDURE `generar_asistencias_diarias` ()   BEGIN
         JOIN asignaturas a ON h.asignatura_id = a.id
         WHERE h.dia_semana = dia_actual;
     END IF;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `registrar_asistencia` (IN `p_identificador_profesor` VARCHAR(50), IN `p_numero_aula` INT)   proc_label: BEGIN  /* Añadimos la etiqueta aquí */
+    -- Variables para almacenar la información
+    DECLARE v_asignatura_id INT;
+    DECLARE v_profesor_asignado_id INT;
+    DECLARE v_nombre_asignatura VARCHAR(100);
+    DECLARE v_profesor_nombre VARCHAR(50);
+    DECLARE v_profesor_apellidos VARCHAR(100);
+    DECLARE v_profesor_tarjeta_id INT;
+    DECLARE v_profesor_tarjeta_nombre VARCHAR(150);
+    DECLARE v_asistencia_id INT;
+    DECLARE v_aula_id INT;
+    DECLARE v_hora_actual TIME;
+    DECLARE v_dia_actual VARCHAR(20);
+    
+    -- Inicializar variables
+    SET v_hora_actual = CURTIME();
+    SET v_dia_actual = get_dia_espanol();
+    
+    -- Obtener el ID del aula a partir del número
+    SELECT id INTO v_aula_id
+    FROM aulas
+    WHERE numero_aula = p_numero_aula
+    LIMIT 1;
+    
+    -- Si no se encuentra el aula, salir
+    IF v_aula_id IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Aula no encontrada';
+        LEAVE proc_label;  /* Usamos la etiqueta aquí */
+    END IF;
+    
+    -- Paso 1: Obtener información sobre la asignatura y profesores
+    SELECT 
+        a.id, 
+        a.profesor_id, 
+        a.nombre_asignatura,
+        p.nombre, 
+        p.apellidos
+    INTO 
+        v_asignatura_id, 
+        v_profesor_asignado_id, 
+        v_nombre_asignatura,
+        v_profesor_nombre, 
+        v_profesor_apellidos
+    FROM 
+        asignaturas a
+        JOIN horarios h ON a.id = h.asignatura_id
+        JOIN profesores p ON a.profesor_id = p.id
+    WHERE 
+        a.aula_id = v_aula_id
+        AND h.dia_semana = v_dia_actual
+        AND v_hora_actual BETWEEN h.hora_inicio AND h.hora_fin
+    LIMIT 1;
+    
+    -- Si no hay clase en este momento en esta aula, salir
+    IF v_asignatura_id IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No hay clase en este momento en esta aula';
+        LEAVE proc_label;  /* Usamos la etiqueta aquí */
+    END IF;
+    
+    -- Paso 2: Obtener información del profesor que pasa la tarjeta
+    SELECT 
+        id, 
+        CONCAT(nombre, ' ', apellidos) AS nombre_completo
+    INTO 
+        v_profesor_tarjeta_id, 
+        v_profesor_tarjeta_nombre
+    FROM 
+        profesores
+    WHERE 
+        identificador = p_identificador_profesor
+    LIMIT 1;
+    
+    -- Si no se encuentra el profesor, salir
+    IF v_profesor_tarjeta_id IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Profesor no encontrado';
+        LEAVE proc_label;  /* Usamos la etiqueta aquí */
+    END IF;
+    
+    -- Paso 3: Verificar si ya existe la asistencia para hoy
+    SELECT 
+        id
+    INTO 
+        v_asistencia_id
+    FROM 
+        asistencias
+    WHERE 
+        asignatura_id = v_asignatura_id
+        AND fecha = CURDATE();
+    
+    -- Si no existe la asistencia, crearla
+    IF v_asistencia_id IS NULL THEN
+        INSERT INTO asistencias (asignatura_id, fecha, presente)
+        VALUES (v_asignatura_id, CURDATE(), 1);
+        
+        SET v_asistencia_id = LAST_INSERT_ID();
+    ELSE
+        -- Si ya existe, actualizarla
+        UPDATE asistencias
+        SET presente = 1
+        WHERE id = v_asistencia_id;
+    END IF;
+    
+    -- Paso 5: Crear incidencia cuando el profesor que registra NO es el asignado
+    IF v_profesor_tarjeta_id <> v_profesor_asignado_id THEN
+        INSERT INTO incidencias (asistencia_id, justificada, descripcion, fecha_incidencia)
+        VALUES (
+            v_asistencia_id,
+            0,
+            CONCAT(
+                'Asignatura: ', v_nombre_asignatura, 
+                ', Hora: ', TIME_FORMAT(v_hora_actual, '%H:%i'), 
+                ', Profesor que registró: ', v_profesor_tarjeta_nombre,
+                ', Profesor asignado: ', v_profesor_nombre, ' ', v_profesor_apellidos
+            ),
+            NOW()
+        );
+    END IF;
+    
+    -- Informar del éxito
+    SELECT 
+        'Asistencia registrada correctamente' AS mensaje,
+        v_nombre_asignatura AS asignatura,
+        v_profesor_tarjeta_nombre AS profesor_que_registra,
+        v_profesor_nombre AS profesor_asignado_nombre,
+        v_profesor_apellidos AS profesor_asignado_apellidos,
+        (v_profesor_tarjeta_id <> v_profesor_asignado_id) AS se_creo_incidencia;
 END$$
 
 --
@@ -110,7 +241,7 @@ CREATE TABLE `asignaturas` (
 INSERT INTO `asignaturas` (`id`, `profesor_id`, `aula_id`, `nombre_asignatura`, `grupo`) VALUES
 (1, 1, 1, 'Programación', '1ºA'),
 (2, 28, 12, 'Álgebra', '1ºB'),
-(6, 28, 1, 'Fal', '4ºB'),
+(6, 28, 12, 'Fal', '4ºB'),
 (7, 5, 1, 'SO', '4ºB'),
 (9, 6, 3, 'Cálculo', '1ºA'),
 (10, 7, 4, 'Física', '1ºB'),
@@ -120,12 +251,12 @@ INSERT INTO `asignaturas` (`id`, `profesor_id`, `aula_id`, `nombre_asignatura`, 
 (14, 11, 8, 'Sistemas Operativos', '3ºB'),
 (15, 12, 9, 'Inteligencia Artificial', '4ºA'),
 (16, 13, 10, 'Compiladores', '4ºB'),
-(17, 27, 1, 'Estadística', '1ºC'),
-(18, 27, 2, 'Matemática Discreta', '1ºD'),
-(19, 27, 3, 'Estructura de Computadores', '2ºC'),
-(20, 26, 4, 'Programación Avanzada', '2ºD'),
-(21, 26, 5, 'Ingeniería del Software', '3ºC'),
-(22, 26, 6, 'Seguridad Informática', '3ºD'),
+(17, 27, 13, 'Estadística', '1ºC'),
+(18, 27, 13, 'Matemática Discreta', '1ºD'),
+(19, 27, 13, 'Estructura de Computadores', '2ºC'),
+(20, 26, 14, 'Programación Avanzada', '2ºD'),
+(21, 26, 14, 'Ingeniería del Software', '3ºC'),
+(22, 26, 14, 'Seguridad Informática', '3ºD'),
 (23, 20, 7, 'Computación Gráfica', '4ºC'),
 (24, 21, 8, 'Sistemas Distribuidos', '4ºD'),
 (25, 22, 9, 'Aprendizaje Automático', '3ºA'),
@@ -199,7 +330,24 @@ INSERT INTO `asistencias` (`id`, `asignatura_id`, `fecha`, `presente`) VALUES
 (57, 15, '2025-05-13', 0),
 (58, 16, '2025-05-13', 0),
 (59, 17, '2025-05-13', 1),
-(60, 18, '2025-05-13', 0);
+(60, 18, '2025-05-13', 0),
+(78, 14, '2025-05-15', 0),
+(79, 15, '2025-05-15', 0),
+(80, 16, '2025-05-15', 0),
+(81, 23, '2025-05-15', 0),
+(82, 24, '2025-05-15', 0),
+(83, 25, '2025-05-15', 0),
+(84, 26, '2025-05-15', 0),
+(85, 27, '2025-05-15', 0),
+(86, 2, '2025-05-15', 1),
+(87, 11, '2025-05-15', 0),
+(88, 6, '2025-05-15', 0),
+(89, 17, '2025-05-15', 0),
+(90, 19, '2025-05-15', 0),
+(91, 18, '2025-05-15', 0),
+(92, 21, '2025-05-15', 0),
+(93, 20, '2025-05-15', 0),
+(94, 22, '2025-05-15', 0);
 
 -- --------------------------------------------------------
 
@@ -251,9 +399,9 @@ CREATE TABLE `departamento` (
 --
 
 INSERT INTO `departamento` (`id`, `nombre_departamento`, `jefe_id`, `correo_departamento`) VALUES
-(1, 'Computadores', 1, 'computadores@ucm.es'),
-(2, 'Redes', 2, 'redes@ucm.es'),
-(3, 'Software', 3, 'software@ucm.es');
+(1, 'Computadores', 1, 'computadores@complutense.es'),
+(2, 'Redes', 2, 'redes@complutense.es'),
+(3, 'Software', 3, 'software@complutense.es');
 
 -- --------------------------------------------------------
 
@@ -316,55 +464,55 @@ INSERT INTO `horarios` (`id`, `asignatura_id`, `dia_semana`, `hora_inicio`, `hor
 (74, 11, 'Viernes', '09:00:00', '11:00:00'),
 (75, 11, 'Sábado', '09:00:00', '11:00:00'),
 (76, 11, 'Domingo', '09:00:00', '11:00:00'),
-(77, 6, 'Lunes', '14:00:00', '17:00:00'),
-(78, 6, 'Martes', '14:00:00', '17:00:00'),
-(79, 6, 'Miércoles', '14:00:00', '17:00:00'),
-(80, 6, 'Jueves', '14:00:00', '17:00:00'),
-(81, 6, 'Viernes', '14:00:00', '17:00:00'),
-(82, 6, 'Sábado', '14:00:00', '17:00:00'),
-(83, 6, 'Domingo', '14:00:00', '17:00:00'),
-(84, 17, 'Lunes', '09:00:00', '11:00:00'),
-(85, 17, 'Martes', '09:00:00', '11:00:00'),
-(86, 17, 'Miércoles', '09:00:00', '11:00:00'),
-(87, 17, 'Jueves', '09:00:00', '11:00:00'),
-(88, 17, 'Viernes', '09:00:00', '11:00:00'),
-(89, 17, 'Sábado', '09:00:00', '11:00:00'),
-(90, 17, 'Domingo', '09:00:00', '11:00:00'),
-(91, 18, 'Lunes', '11:00:00', '13:00:00'),
-(92, 18, 'Martes', '11:00:00', '13:00:00'),
-(93, 18, 'Miércoles', '11:00:00', '13:00:00'),
-(94, 18, 'Jueves', '11:00:00', '13:00:00'),
-(95, 18, 'Viernes', '11:00:00', '13:00:00'),
-(96, 18, 'Sábado', '11:00:00', '13:00:00'),
-(97, 18, 'Domingo', '11:00:00', '13:00:00'),
-(98, 19, 'Lunes', '14:00:00', '17:00:00'),
-(99, 19, 'Martes', '14:00:00', '17:00:00'),
-(100, 19, 'Miércoles', '14:00:00', '17:00:00'),
-(101, 19, 'Jueves', '14:00:00', '17:00:00'),
-(102, 19, 'Viernes', '14:00:00', '17:00:00'),
-(103, 19, 'Sábado', '14:00:00', '17:00:00'),
-(104, 19, 'Domingo', '14:00:00', '17:00:00'),
-(105, 20, 'Lunes', '09:00:00', '11:00:00'),
-(106, 20, 'Martes', '09:00:00', '11:00:00'),
-(107, 20, 'Miércoles', '09:00:00', '11:00:00'),
-(108, 20, 'Jueves', '09:00:00', '11:00:00'),
-(109, 20, 'Viernes', '09:00:00', '11:00:00'),
-(110, 20, 'Sábado', '09:00:00', '11:00:00'),
-(111, 20, 'Domingo', '09:00:00', '11:00:00'),
-(112, 21, 'Lunes', '11:00:00', '13:00:00'),
-(113, 21, 'Martes', '11:00:00', '13:00:00'),
-(114, 21, 'Miércoles', '11:00:00', '13:00:00'),
-(115, 21, 'Jueves', '11:00:00', '13:00:00'),
-(116, 21, 'Viernes', '11:00:00', '13:00:00'),
-(117, 21, 'Sábado', '11:00:00', '13:00:00'),
-(118, 21, 'Domingo', '11:00:00', '13:00:00'),
-(119, 22, 'Lunes', '14:00:00', '17:00:00'),
-(120, 22, 'Martes', '14:00:00', '17:00:00'),
-(121, 22, 'Miércoles', '14:00:00', '17:00:00'),
-(122, 22, 'Jueves', '14:00:00', '17:00:00'),
-(123, 22, 'Viernes', '14:00:00', '17:00:00'),
-(124, 22, 'Sábado', '14:00:00', '17:00:00'),
-(125, 22, 'Domingo', '14:00:00', '17:00:00');
+(126, 6, 'Lunes', '14:00:00', '17:00:00'),
+(127, 6, 'Martes', '14:00:00', '17:00:00'),
+(128, 6, 'Miércoles', '14:00:00', '17:00:00'),
+(129, 6, 'Jueves', '14:00:00', '17:00:00'),
+(130, 6, 'Viernes', '14:00:00', '17:00:00'),
+(131, 6, 'Lunes', '14:00:00', '17:00:00'),
+(132, 6, 'Lunes', '14:00:00', '17:00:00'),
+(133, 17, 'Lunes', '09:00:00', '11:00:00'),
+(134, 17, 'Martes', '09:00:00', '11:00:00'),
+(135, 17, 'Miércoles', '09:00:00', '11:00:00'),
+(136, 17, 'Jueves', '09:00:00', '11:00:00'),
+(137, 17, 'Viernes', '09:00:00', '11:00:00'),
+(138, 17, 'Lunes', '09:00:00', '11:00:00'),
+(139, 17, 'Lunes', '09:00:00', '11:00:00'),
+(140, 19, 'Lunes', '14:00:00', '17:00:00'),
+(141, 19, 'Martes', '14:00:00', '17:00:00'),
+(142, 19, 'Miércoles', '14:00:00', '17:00:00'),
+(143, 19, 'Jueves', '14:00:00', '17:00:00'),
+(144, 19, 'Viernes', '14:00:00', '17:00:00'),
+(145, 19, 'Lunes', '14:00:00', '17:00:00'),
+(146, 19, 'Lunes', '14:00:00', '17:00:00'),
+(147, 18, 'Lunes', '11:00:00', '13:00:00'),
+(148, 18, 'Martes', '11:00:00', '13:00:00'),
+(149, 18, 'Miércoles', '11:00:00', '13:00:00'),
+(150, 18, 'Jueves', '11:00:00', '13:00:00'),
+(151, 18, 'Viernes', '11:00:00', '13:00:00'),
+(152, 18, 'Lunes', '11:00:00', '13:00:00'),
+(153, 18, 'Lunes', '11:00:00', '13:00:00'),
+(154, 21, 'Lunes', '11:00:00', '13:00:00'),
+(155, 21, 'Martes', '11:00:00', '13:00:00'),
+(156, 21, 'Miércoles', '11:00:00', '13:00:00'),
+(157, 21, 'Jueves', '11:00:00', '13:00:00'),
+(158, 21, 'Viernes', '11:00:00', '13:00:00'),
+(159, 21, 'Lunes', '11:00:00', '13:00:00'),
+(160, 21, 'Lunes', '11:00:00', '13:00:00'),
+(161, 20, 'Lunes', '09:00:00', '11:00:00'),
+(162, 20, 'Martes', '09:00:00', '11:00:00'),
+(163, 20, 'Miércoles', '09:00:00', '11:00:00'),
+(164, 20, 'Jueves', '09:00:00', '11:00:00'),
+(165, 20, 'Viernes', '09:00:00', '11:00:00'),
+(166, 20, 'Lunes', '09:00:00', '11:00:00'),
+(167, 20, 'Lunes', '09:00:00', '11:00:00'),
+(168, 22, 'Lunes', '14:00:00', '17:00:00'),
+(169, 22, 'Martes', '14:00:00', '17:00:00'),
+(170, 22, 'Miércoles', '14:00:00', '17:00:00'),
+(171, 22, 'Jueves', '14:00:00', '17:00:00'),
+(172, 22, 'Viernes', '14:00:00', '17:00:00'),
+(173, 22, 'Lunes', '14:00:00', '17:00:00'),
+(174, 22, 'Lunes', '14:00:00', '17:00:00');
 
 -- --------------------------------------------------------
 
@@ -385,50 +533,51 @@ CREATE TABLE `incidencias` (
 --
 
 INSERT INTO `incidencias` (`id`, `asistencia_id`, `justificada`, `descripcion`, `fecha_incidencia`) VALUES
-(10, 8, 0, '', '2025-03-04 09:15:00'),
+(10, 8, 0, 'No se paso la tarjeta', '2025-03-04 09:15:00'),
 (11, 9, 1, 'Cita médica urgente', '2025-03-04 10:30:00'),
-(12, 10, 0, '', '2025-03-04 12:45:00'),
+(12, 10, 0, 'No se paso la tarjeta', '2025-03-04 12:45:00'),
 (13, 11, 1, 'Problema familiar', '2025-03-04 15:20:00'),
-(14, 12, 0, '', '2025-03-04 17:10:00'),
+(14, 12, 0, 'No se paso la tarjeta', '2025-03-04 17:10:00'),
 (15, 13, 1, 'Enfermedad', '2025-03-05 09:05:00'),
-(16, 14, 0, '', '2025-03-05 10:15:00'),
+(16, 14, 0, 'No se paso la tarjeta', '2025-03-05 10:15:00'),
 (17, 15, 1, 'Asistencia a congreso académico', '2025-03-05 12:30:00'),
-(18, 16, 0, '', '2025-03-05 15:40:00'),
+(18, 16, 0, 'No se paso la tarjeta', '2025-03-05 15:40:00'),
 (19, 17, 1, 'Accidente de tráfico', '2025-03-05 17:25:00'),
-(20, 18, 0, '', '2025-03-06 09:00:00'),
+(20, 18, 0, 'No se paso la tarjeta', '2025-03-06 09:00:00'),
 (21, 19, 1, 'Problema con transporte público', '2025-03-06 10:45:00'),
-(22, 20, 0, '', '2025-03-06 12:50:00'),
+(22, 20, 0, 'No se paso la tarjeta', '2025-03-06 12:50:00'),
 (23, 21, 1, 'Trámites administrativos urgentes', '2025-03-06 15:15:00'),
-(24, 22, 0, '', '2025-03-06 17:30:00'),
+(24, 22, 0, 'No se paso la tarjeta', '2025-03-06 17:30:00'),
 (25, 23, 1, 'Enfermedad', '2025-03-07 09:20:00'),
-(26, 24, 0, '', '2025-03-07 10:10:00'),
+(26, 24, 0, 'No se paso la tarjeta', '2025-03-07 10:10:00'),
 (27, 25, 1, 'Asistencia a seminario', '2025-03-07 12:40:00'),
-(28, 26, 0, '', '2025-03-07 15:30:00'),
+(28, 26, 0, 'No se paso la tarjeta', '2025-03-07 15:30:00'),
 (29, 27, 1, 'Problemas personales', '2025-03-07 17:00:00'),
-(30, 28, 0, '', '2025-04-01 09:05:00'),
+(30, 28, 0, 'No se paso la tarjeta', '2025-04-01 09:05:00'),
 (31, 29, 1, 'Enfermedad', '2025-04-01 10:25:00'),
-(32, 30, 0, '', '2025-04-01 12:35:00'),
+(32, 30, 0, 'No se paso la tarjeta', '2025-04-01 12:35:00'),
 (33, 31, 1, 'Asistencia a evento académico', '2025-04-01 15:50:00'),
-(34, 32, 0, '', '2025-04-01 17:15:00'),
+(34, 32, 0, 'No se paso la tarjeta', '2025-04-01 17:15:00'),
 (35, 33, 1, 'Problemas de salud', '2025-04-02 09:10:00'),
-(36, 34, 0, '', '2025-04-02 10:05:00'),
+(36, 34, 0, 'No se paso la tarjeta', '2025-04-02 10:05:00'),
 (37, 35, 1, 'Fallecimiento familiar', '2025-04-02 12:20:00'),
-(38, 36, 0, '', '2025-04-02 15:45:00'),
+(38, 36, 0, 'No se paso la tarjeta', '2025-04-02 15:45:00'),
 (39, 37, 1, 'Cita médica especialista', '2025-04-02 17:05:00'),
-(40, 38, 0, '', '2025-04-03 09:25:00'),
+(40, 38, 0, 'No se paso la tarjeta', '2025-04-03 09:25:00'),
 (41, 39, 1, 'Avería en vehículo', '2025-04-03 10:35:00'),
-(42, 40, 0, '', '2025-04-03 12:15:00'),
+(42, 40, 0, 'No se paso la tarjeta', '2025-04-03 12:15:00'),
 (43, 41, 1, 'Asistencia a defensa de TFG', '2025-04-03 15:10:00'),
-(44, 42, 0, '', '2025-04-03 17:20:00'),
+(44, 42, 0, 'No se paso la tarjeta', '2025-04-03 17:20:00'),
 (45, 43, 1, 'Huelga de transportes', '2025-04-04 09:30:00'),
-(46, 44, 0, '', '2025-04-04 10:00:00'),
+(46, 44, 0, 'No se paso la tarjeta', '2025-04-04 10:00:00'),
 (47, 45, 1, 'Ingreso hospitalario urgente', '2025-04-04 12:25:00'),
-(48, 46, 0, '', '2025-04-04 15:35:00'),
+(48, 46, 0, 'No se paso la tarjeta', '2025-04-04 15:35:00'),
 (49, 47, 1, 'Citación judicial', '2025-04-04 17:40:00'),
-(57, 56, 0, '', '2025-05-13 21:00:00'),
-(58, 57, 0, '', '2025-05-13 21:00:00'),
-(59, 58, 0, '', '2025-05-13 21:00:00'),
-(60, 60, 0, '', '2025-05-13 21:00:00');
+(57, 56, 0, 'No se paso la tarjeta', '2025-05-13 21:00:00'),
+(58, 57, 0, 'No se paso la tarjeta', '2025-05-13 21:00:00'),
+(59, 58, 0, 'No se paso la tarjeta', '2025-05-13 21:00:00'),
+(60, 60, 0, 'No se paso la tarjeta', '2025-05-13 21:00:00'),
+(64, 86, 0, 'No se paso la tarjeta', '2025-05-15 12:35:10');
 
 -- --------------------------------------------------------
 
@@ -450,7 +599,6 @@ INSERT INTO `nolectivo` (`id`, `fecha`, `descripcion`) VALUES
 (2, '2025-03-11', 'Prueba'),
 (3, '2025-05-01', 'Día del Trabajo'),
 (4, '2025-05-02', 'Día de la Comunidad de Madrid'),
-(5, '2025-05-15', 'San Isidro'),
 (6, '2025-06-24', 'San Juan'),
 (7, '2025-07-25', 'Santiago Apóstol'),
 (8, '2025-08-15', 'Asunción de la Virgen'),
@@ -481,31 +629,31 @@ CREATE TABLE `profesores` (
 --
 
 INSERT INTO `profesores` (`id`, `nombre`, `apellidos`, `identificador`, `CorreoPropio`, `departamento_id`) VALUES
-(1, 'Raquel', 'Díaz Sánchez', '04 aa bb cc 24 02 89', 'raquel.diaz@ucm.es', 1),
-(2, 'Carlos', 'López García', '04 dd ee ff 24 02 89', 'carlos.lopez@ucm.es', 2),
-(3, 'Maríant', 'Pérez Gómez', '04 11 22 33 24 02 89', 'maria.perez@ucm.es', 3),
+(1, 'Raquel', 'Díaz Sánchez', '04 aa bb cc 24 02 89', 'raquel.diaz@complutense.es', 1),
+(2, 'Carlos', 'López García', '04 dd ee ff 24 02 89', 'carlos.lopez@complutense.es', 2),
+(3, 'Maríant', 'Pérez Gómez', '04 11 22 33 24 02 89', 'maria.perez@complutense.es', 3),
 (5, 'Ángel', 'Gallego Muñoz', '04 44 55 66 24 02 89', 'anggal02@ucm.es', 1),
-(6, 'Elena', 'Martínez Rodríguez', '04 77 88 99 24 02 89', 'elena.martinez@ucm.es', 1),
-(7, 'David', 'García Sánchez', '04 ab cd ef 24 02 89', 'david.garcia@ucm.es', 2),
-(8, 'Laura', 'Hernández López', '04 fe dc ba 24 02 89', 'laura.hernandez@ucm.es', 3),
-(9, 'Javier', 'Fernández González', '04 12 34 56 24 02 89', 'javier.fernandez@ucm.es', 1),
-(10, 'Ana', 'González Pérez', '04 78 9a bc 24 02 89', 'ana.gonzalez@ucm.es', 2),
-(11, 'Pablo', 'Sánchez Martínez', '04 de f0 12 24 02 89', 'pablo.sanchez@ucm.es', 3),
-(12, 'Lucía', 'López García', '04 34 56 78 24 02 89', 'lucia.lopez@ucm.es', 1),
-(13, 'Jorge', 'Pérez Hernández', '04 9a bc de 24 02 89', 'jorge.perez@ucm.es', 2),
-(14, 'Sara', 'Rodríguez Fernández', '04 f0 12 34 24 02 89', 'sara.rodriguez@ucm.es', 3),
-(15, 'Miguel', 'González García', '04 56 78 9a 24 02 89', 'miguel.gonzalez@ucm.es', 1),
-(16, 'Carmen', 'López Rodríguez', '04 bc de f0 24 02 89', 'carmen.lopez@ucm.es', 2),
-(17, 'Luis', 'Martínez González', '04 13 57 9b 24 02 89', 'luis.martinez@ucm.es', 3),
-(18, 'Paula', 'Sánchez López', '04 24 68 ac 24 02 89', 'paula.sanchez@ucm.es', 1),
-(19, 'Alberto', 'García Martínez', '04 35 79 bd 24 02 89', 'alberto.garcia@ucm.es', 2),
-(20, 'Eva', 'Fernández Sánchez', '04 46 8a ce 24 02 89', 'eva.fernandez@ucm.es', 3),
-(21, 'Daniel', 'Hernández González', '04 57 9b df 24 02 89', 'daniel.hernandez@ucm.es', 1),
-(22, 'Marina', 'Pérez García', '04 68 ac e0 24 02 89', 'marina.perez@ucm.es', 2),
-(23, 'Adrián', 'Rodríguez López', '04 79 bd f1 24 02 89', 'adrian.rodriguez@ucm.es', 3),
-(24, 'Marta', 'González Hernández', '04 8a ce 02 24 02 89', 'marta.gonzalez@ucm.es', 1),
-(25, 'Diego', 'López Pérez', '04 9b df 13 24 02 89', 'diego.lopez@ucm.es', 2),
-(26, 'María', 'González Rodríguez', '04 41 73 46 24 02 89', 'maria.gonzalez@ucm.es', 1),
+(6, 'Elena', 'Martínez Rodríguez', '04 77 88 99 24 02 89', 'elena.martinez@complutense.es', 1),
+(7, 'David', 'García Sánchez', '04 ab cd ef 24 02 89', 'david.garcia@complutense.es', 2),
+(8, 'Laura', 'Hernández López', '04 fe dc ba 24 02 89', 'laura.hernandez@complutense.es', 3),
+(9, 'Javier', 'Fernández González', '04 12 34 56 24 02 89', 'javier.fernandez@complutense.es', 1),
+(10, 'Ana', 'González Pérez', '04 78 9a bc 24 02 89', 'ana.gonzalez@complutense.es', 2),
+(11, 'Pablo', 'Sánchez Martínez', '04 de f0 12 24 02 89', 'pablo.sanchez@complutense.es', 3),
+(12, 'Lucía', 'López García', '04 34 56 78 24 02 89', 'lucia.lopez@complutense.es', 1),
+(13, 'Jorge', 'Pérez Hernández', '04 9a bc de 24 02 89', 'jorge.perez@complutense.es', 2),
+(14, 'Sara', 'Rodríguez Fernández', '04 f0 12 34 24 02 89', 'sara.rodriguez@complutense.es', 3),
+(15, 'Miguel', 'González García', '04 56 78 9a 24 02 89', 'miguel.gonzalez@complutense.es', 1),
+(16, 'Carmen', 'López Rodríguez', '04 bc de f0 24 02 89', 'carmen.lopez@complutense.es', 2),
+(17, 'Luis', 'Martínez González', '04 13 57 9b 24 02 89', 'luis.martinez@complutense.es', 3),
+(18, 'Paula', 'Sánchez López', '04 24 68 ac 24 02 89', 'paula.sanchez@complutense.es', 1),
+(19, 'Alberto', 'García Martínez', '04 35 79 bd 24 02 89', 'alberto.garcia@complutense.es', 2),
+(20, 'Eva', 'Fernández Sánchez', '04 46 8a ce 24 02 89', 'eva.fernandez@complutense.es', 3),
+(21, 'Daniel', 'Hernández González', '04 57 9b df 24 02 89', 'daniel.hernandez@complutense.es', 1),
+(22, 'Marina', 'Pérez García', '04 68 ac e0 24 02 89', 'marina.perez@complutense.es', 2),
+(23, 'Adrián', 'Rodríguez López', '04 79 bd f1 24 02 89', 'adrian.rodriguez@complutense.es', 3),
+(24, 'Marta', 'González Hernández', '04 8a ce 02 24 02 89', 'marta.gonzalez@complutense.es', 1),
+(25, 'Diego', 'López Pérez', '04 9b df 13 24 02 89', 'diego.lopez@complutense.es', 2),
+(26, 'María', 'González Rodríguez', '04 41 73 46 24 02 89', 'maria.gonzalez@complutense.es', 1),
 (27, 'Dorzhi', 'García España', '04 31 2d 4b 24 02 89', 'dorzhi.garcia@ucm.es', 1),
 (28, 'Daniel', 'Lopez Escobar', '04 01 53 67 24 02 89', 'daniel.lopez@ucm.es', 1);
 
@@ -612,7 +760,7 @@ ALTER TABLE `asignaturas`
 -- AUTO_INCREMENT de la tabla `asistencias`
 --
 ALTER TABLE `asistencias`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=109;
 
 --
 -- AUTO_INCREMENT de la tabla `aulas`
@@ -630,13 +778,13 @@ ALTER TABLE `departamento`
 -- AUTO_INCREMENT de la tabla `horarios`
 --
 ALTER TABLE `horarios`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=175;
 
 --
 -- AUTO_INCREMENT de la tabla `incidencias`
 --
 ALTER TABLE `incidencias`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT de la tabla `nolectivo`

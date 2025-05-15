@@ -338,7 +338,7 @@ verificarSesion();
                     
                     <!-- Sección de horario -->
                     <div id="seccion-horario" class="info-section horario-container">
-                        <div class="horario-title">PRIMER CUATRIMESTRE</div>
+                        <div class="horario-title">HORARIO</div>
                         <table class="horario-table">
                             <thead>
                                 <tr>
