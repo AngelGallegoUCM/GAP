@@ -3,13 +3,13 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: mysql:3306
--- Tiempo de generación: 15-05-2025 a las 10:37:33
+-- Tiempo de generación: 26-05-2025 a las 19:37:32
 -- Versión del servidor: 8.4.5
 -- Versión de PHP: 8.3.19
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET GLOBAL time_zone = 'Europe/Madrid';
+SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -64,7 +64,7 @@ CREATE DEFINER=`root`@`%` PROCEDURE `generar_asistencias_diarias` ()   BEGIN
     END IF;
 END$$
 
-CREATE DEFINER=`root`@`%` PROCEDURE `registrar_asistencia` (IN `p_identificador_profesor` VARCHAR(50), IN `p_numero_aula` INT)   proc_label: BEGIN  /* Añadimos la etiqueta aquí */
+CREATE DEFINER=`root`@`%` PROCEDURE `registrar_asistencia` (IN `p_identificador_profesor` VARCHAR(50), IN `p_numero_aula` VARCHAR(4))   proc_label: BEGIN  /* Añadimos la etiqueta aquí */
     -- Variables para almacenar la información
     DECLARE v_asignatura_id INT;
     DECLARE v_profesor_asignado_id INT;
@@ -347,7 +347,95 @@ INSERT INTO `asistencias` (`id`, `asignatura_id`, `fecha`, `presente`) VALUES
 (91, 18, '2025-05-15', 0),
 (92, 21, '2025-05-15', 0),
 (93, 20, '2025-05-15', 0),
-(94, 22, '2025-05-15', 0);
+(94, 22, '2025-05-15', 0),
+(109, 7, '2025-05-16', 0),
+(110, 23, '2025-05-16', 0),
+(111, 24, '2025-05-16', 0),
+(112, 25, '2025-05-16', 0),
+(113, 26, '2025-05-16', 0),
+(114, 27, '2025-05-16', 0),
+(115, 28, '2025-05-16', 0),
+(116, 2, '2025-05-16', 0),
+(117, 11, '2025-05-16', 0),
+(118, 6, '2025-05-16', 0),
+(119, 17, '2025-05-16', 0),
+(120, 19, '2025-05-16', 0),
+(121, 18, '2025-05-16', 0),
+(122, 21, '2025-05-16', 0),
+(123, 20, '2025-05-16', 0),
+(124, 22, '2025-05-16', 0),
+(140, 1, '2025-05-19', 0),
+(141, 9, '2025-05-19', 0),
+(142, 10, '2025-05-19', 0),
+(143, 12, '2025-05-19', 0),
+(144, 13, '2025-05-19', 0),
+(145, 28, '2025-05-19', 0),
+(146, 2, '2025-05-19', 0),
+(147, 11, '2025-05-19', 0),
+(148, 6, '2025-05-19', 0),
+(149, 6, '2025-05-19', 0),
+(150, 6, '2025-05-19', 0),
+(151, 17, '2025-05-19', 0),
+(152, 17, '2025-05-19', 0),
+(153, 17, '2025-05-19', 0),
+(154, 19, '2025-05-19', 0),
+(155, 19, '2025-05-19', 0),
+(156, 19, '2025-05-19', 0),
+(157, 18, '2025-05-19', 0),
+(158, 18, '2025-05-19', 0),
+(159, 18, '2025-05-19', 0),
+(160, 21, '2025-05-19', 0),
+(161, 21, '2025-05-19', 0),
+(162, 21, '2025-05-19', 0),
+(163, 20, '2025-05-19', 0),
+(164, 20, '2025-05-19', 0),
+(165, 20, '2025-05-19', 0),
+(166, 22, '2025-05-19', 0),
+(167, 22, '2025-05-19', 0),
+(168, 22, '2025-05-19', 0),
+(171, 14, '2025-05-20', 0),
+(172, 15, '2025-05-20', 0),
+(173, 16, '2025-05-20', 0),
+(174, 2, '2025-05-20', 0),
+(175, 11, '2025-05-20', 0),
+(176, 6, '2025-05-20', 0),
+(177, 17, '2025-05-20', 0),
+(178, 19, '2025-05-20', 0),
+(179, 18, '2025-05-20', 0),
+(180, 21, '2025-05-20', 0),
+(181, 20, '2025-05-20', 0),
+(182, 22, '2025-05-20', 0),
+(186, 9, '2025-05-21', 0),
+(187, 10, '2025-05-21', 0),
+(188, 12, '2025-05-21', 0),
+(189, 13, '2025-05-21', 0),
+(190, 2, '2025-05-21', 0),
+(191, 11, '2025-05-21', 0),
+(192, 6, '2025-05-21', 0),
+(193, 17, '2025-05-21', 0),
+(194, 19, '2025-05-21', 0),
+(195, 18, '2025-05-21', 0),
+(196, 21, '2025-05-21', 0),
+(197, 20, '2025-05-21', 0),
+(198, 22, '2025-05-21', 0),
+(201, 14, '2025-05-22', 0),
+(202, 15, '2025-05-22', 0),
+(203, 16, '2025-05-22', 0),
+(204, 23, '2025-05-22', 0),
+(205, 24, '2025-05-22', 0),
+(206, 25, '2025-05-22', 0),
+(207, 26, '2025-05-22', 0),
+(208, 27, '2025-05-22', 0),
+(209, 2, '2025-05-22', 0),
+(210, 11, '2025-05-22', 0),
+(211, 6, '2025-05-22', 0),
+(212, 17, '2025-05-22', 0),
+(213, 19, '2025-05-22', 0),
+(214, 18, '2025-05-22', 0),
+(215, 21, '2025-05-22', 0),
+(216, 20, '2025-05-22', 0),
+(217, 22, '2025-05-22', 0),
+(218, 14, '2025-05-26', 0);
 
 -- --------------------------------------------------------
 
@@ -357,7 +445,7 @@ INSERT INTO `asistencias` (`id`, `asignatura_id`, `fecha`, `presente`) VALUES
 
 CREATE TABLE `aulas` (
   `id` int NOT NULL,
-  `numero_aula` int NOT NULL,
+  `numero_aula` varchar(4) DEFAULT NULL,
   `capacidad` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -366,20 +454,20 @@ CREATE TABLE `aulas` (
 --
 
 INSERT INTO `aulas` (`id`, `numero_aula`, `capacidad`) VALUES
-(1, 101, 24),
-(2, 102, 25),
-(3, 103, 40),
-(4, 104, 30),
-(5, 105, 25),
-(6, 106, 35),
-(7, 201, 40),
-(8, 202, 45),
-(9, 203, 30),
-(10, 204, 35),
-(11, 205, 28),
-(12, 301, 50),
-(13, 302, 45),
-(14, 303, 30);
+(1, '0101', 24),
+(2, '0102', 25),
+(3, '0103', 40),
+(4, '0104', 30),
+(5, '0105', 25),
+(6, '0106', 35),
+(7, '0201', 40),
+(8, '0202', 45),
+(9, '0203', 30),
+(10, '0204', 35),
+(11, '0205', 28),
+(12, '0301', 50),
+(13, '0302', 45),
+(14, '0303', 30);
 
 -- --------------------------------------------------------
 
@@ -577,7 +665,92 @@ INSERT INTO `incidencias` (`id`, `asistencia_id`, `justificada`, `descripcion`, 
 (58, 57, 0, 'No se paso la tarjeta', '2025-05-13 21:00:00'),
 (59, 58, 0, 'No se paso la tarjeta', '2025-05-13 21:00:00'),
 (60, 60, 0, 'No se paso la tarjeta', '2025-05-13 21:00:00'),
-(64, 86, 0, 'No se paso la tarjeta', '2025-05-15 12:35:10');
+(65, 78, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(66, 79, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(67, 80, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(68, 81, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(69, 82, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(70, 83, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(71, 84, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(72, 85, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(73, 87, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(74, 88, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(75, 89, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(76, 90, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(77, 91, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(78, 92, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(79, 93, 0, 'No se ha pasado la tarjeta', '2025-05-15 21:00:00'),
+(80, 94, 1, 'Falta médica ', '2025-05-15 21:00:00'),
+(96, 109, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(97, 110, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(98, 111, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(99, 112, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(100, 113, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(101, 114, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(102, 115, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(103, 116, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(104, 117, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(105, 118, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(106, 119, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(107, 120, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(108, 121, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(109, 122, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(110, 123, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(111, 124, 0, 'No se ha pasado la tarjeta', '2025-05-16 21:00:00'),
+(127, 140, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(128, 141, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(129, 142, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(130, 143, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(131, 144, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(132, 145, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(133, 146, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(134, 147, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(135, 148, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(136, 149, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(137, 150, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(138, 151, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(139, 152, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(140, 153, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(141, 154, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(142, 155, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(143, 156, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(144, 157, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(145, 158, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(146, 159, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(147, 160, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(148, 161, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(149, 162, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(150, 163, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(151, 164, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(152, 165, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(153, 166, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(154, 167, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(155, 168, 0, 'No se ha pasado la tarjeta', '2025-05-19 21:00:00'),
+(158, 171, 0, 'No se ha pasado la tarjeta', '2025-05-20 21:00:00'),
+(159, 172, 0, 'No se ha pasado la tarjeta', '2025-05-20 21:00:00'),
+(160, 173, 0, 'No se ha pasado la tarjeta', '2025-05-20 21:00:00'),
+(161, 174, 0, 'No se ha pasado la tarjeta', '2025-05-20 21:00:00'),
+(162, 175, 0, 'No se ha pasado la tarjeta', '2025-05-20 21:00:00'),
+(163, 176, 0, 'No se ha pasado la tarjeta', '2025-05-20 21:00:00'),
+(164, 177, 0, 'No se ha pasado la tarjeta', '2025-05-20 21:00:00'),
+(165, 178, 0, 'No se ha pasado la tarjeta', '2025-05-20 21:00:00'),
+(166, 179, 0, 'No se ha pasado la tarjeta', '2025-05-20 21:00:00'),
+(167, 180, 0, 'No se ha pasado la tarjeta', '2025-05-20 21:00:00'),
+(168, 181, 0, 'No se ha pasado la tarjeta', '2025-05-20 21:00:00'),
+(169, 182, 0, 'No se ha pasado la tarjeta', '2025-05-20 21:00:00'),
+(173, 186, 0, 'No se ha pasado la tarjeta', '2025-05-21 21:00:00'),
+(174, 187, 0, 'No se ha pasado la tarjeta', '2025-05-21 21:00:00'),
+(175, 188, 0, 'No se ha pasado la tarjeta', '2025-05-21 21:00:00'),
+(176, 189, 0, 'No se ha pasado la tarjeta', '2025-05-21 21:00:00'),
+(177, 190, 0, 'No se ha pasado la tarjeta', '2025-05-21 21:00:00'),
+(178, 191, 0, 'No se ha pasado la tarjeta', '2025-05-21 21:00:00'),
+(179, 192, 0, 'No se ha pasado la tarjeta', '2025-05-21 21:00:00'),
+(180, 193, 0, 'No se ha pasado la tarjeta', '2025-05-21 21:00:00'),
+(181, 194, 0, 'No se ha pasado la tarjeta', '2025-05-21 21:00:00'),
+(182, 195, 0, 'No se ha pasado la tarjeta', '2025-05-21 21:00:00'),
+(183, 196, 0, 'No se ha pasado la tarjeta', '2025-05-21 21:00:00'),
+(184, 197, 0, 'No se ha pasado la tarjeta', '2025-05-21 21:00:00'),
+(185, 198, 0, 'No se ha pasado la tarjeta', '2025-05-21 21:00:00');
 
 -- --------------------------------------------------------
 
@@ -677,7 +850,7 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id`, `username`, `password`, `nombre`, `rol`, `fecha_creacion`) VALUES
-(5, 'admin', '$2y$10$Slf/MTCSdKc7NV96IJUw5uDGcYMcFpFydb4hDLtWET96ntAEmRqn2', 'Administrador', 'admin', '2025-04-30 09:25:56');
+(5, 'admin', '$2y$10$Slf/MTCSdKc7NV96IJUw5uDGcYMcFpFydb4hDLtWET96ntAEmRqn2', 'Administrador', 'admin', '2025-04-30 07:25:56');
 
 --
 -- Índices para tablas volcadas
@@ -760,7 +933,7 @@ ALTER TABLE `asignaturas`
 -- AUTO_INCREMENT de la tabla `asistencias`
 --
 ALTER TABLE `asistencias`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=109;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=219;
 
 --
 -- AUTO_INCREMENT de la tabla `aulas`
@@ -784,7 +957,7 @@ ALTER TABLE `horarios`
 -- AUTO_INCREMENT de la tabla `incidencias`
 --
 ALTER TABLE `incidencias`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=186;
 
 --
 -- AUTO_INCREMENT de la tabla `nolectivo`

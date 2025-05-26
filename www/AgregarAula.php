@@ -24,8 +24,8 @@ verificarRol(['admin', 'editor']);
         <form action="php/InsertarAula.php" method="POST" class="form-container">
             <div class="form-group">
                 <label for="numero_aula">Número de Aula:</label>
-                <input type="number" id="numero_aula" name="numero_aula" min="1" max="999" required 
-                       title="Ingrese un número entre 1 y 999">
+                <input type="text" id="numero_aula" name="numero_aula" pattern="\d{4}" maxlength="4" required
+                    title="Ingrese exactamente 4 dígitos, por ejemplo: 0013">
 
                 <label for="capacidad">Capacidad:</label>
                 <input type="number" id="capacidad" name="capacidad" min="1" max="300" required

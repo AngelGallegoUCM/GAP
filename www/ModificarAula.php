@@ -53,22 +53,23 @@ if (isset($_GET['id']) && !empty($_GET['id']) && is_numeric($_GET['id'])) {
 
             <div class="form-group">
                 <label for="numero_aula">Número de Aula:</label>
-                <input type="number" id="numero_aula" name="numero_aula" 
-                       value="<?php echo htmlspecialchars($aula['numero_aula']); ?>" 
-                       min="1" max="999" required 
-                       title="Ingrese un número entre 1 y 999">
+                <input type="text" id="numero_aula" name="numero_aula" 
+                    value="<?php echo htmlspecialchars($aula['numero_aula']); ?>" 
+                    pattern="\d{4}" maxlength="4" required
+                    title="Ingrese exactamente 4 dígitos, por ejemplo: 0013">
 
                 <label for="capacidad">Capacidad:</label>
                 <input type="number" id="capacidad" name="capacidad" 
-                       value="<?php echo htmlspecialchars($aula['capacidad']); ?>" 
-                       min="1" max="300" required
-                       title="Ingrese un número entre 1 y 300">
+                    value="<?php echo htmlspecialchars($aula['capacidad']); ?>" 
+                    min="1" max="300" required
+                    title="Ingrese un número entre 1 y 300">
             </div>
 
             <!-- Botones -->
             <button type="submit">Guardar Cambios</button>
             <button type="button" onclick="window.location.href='ListadoAulas.php'">Volver</button>
         </form>
+
 
     </main>
 </body>
